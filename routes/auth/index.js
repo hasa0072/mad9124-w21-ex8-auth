@@ -1,9 +1,8 @@
 import express from 'express'
 import sanitizeBody from '../../middleware/sanitizeBody.js'
+import authenticate from '../../middleware/auth.js'
 import User from '../../models/User.js'
 const router = express.Router()
-
-const saltRounds = 14
 
 // Register a new user
 router.post('/users', sanitizeBody, async (req, res) => {
@@ -24,7 +23,6 @@ router.post('/users', sanitizeBody, async (req, res) => {
         ]
       })
     }
-    newUser.password = await bcrypt.hash(newUser.password, saltRounds)
     await newUser.save()
     res.status(201).send({ data: newUser })
   } catch (err) {
@@ -60,5 +58,11 @@ router.post('/tokens', sanitizeBody, async (req, res) => {
   // if any condition failed, return an error message
   res.status(201).send({ data: { token: user.generateAuthToken() } })
 })
+
+router.get('/users/me', authenticate, async (req, res) => {
+  const user = await User.findById(req.user._id)
+  res.send({ data: user })
+})
+
 
 export default router

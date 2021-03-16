@@ -26,6 +26,21 @@ schema.statics.authenticate = async function (email, password) {
   // remember if the email did not match, user === null
 }
 
+schema.pre('save', async function (next) {
+  // Only encrypt if the password property is being changed.
+  if (!this.isModified('password')) return next()
+
+  this.password = await bcrypt.hash(this.password, saltRounds)
+  next()
+})
+
+schema.methods.toJSON = function () {
+  const obj = this.toObject()
+  delete obj.password
+  delete obj.__v
+  return obj
+}
+
 const Model = mongoose.model('User', schema) // factory function returns a class
 
 export default Model
