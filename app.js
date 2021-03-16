@@ -3,6 +3,7 @@ import express from 'express'
 import sanitizeMongo from 'express-mongo-sanitize'
 import carsRouter from './routes/cars.js'
 import peopleRouter from './routes/people.js'
+import authRouter from './routes/auth/index.js'
 
 import connectDatabase from './startup/connectDatabase.js'
 connectDatabase()
@@ -16,5 +17,6 @@ app.use(sanitizeMongo())
 // routes
 app.use('/api/cars', carsRouter)
 app.use('/api/people', peopleRouter)
+app.use('/auth', authRouter)
 
 export default app
